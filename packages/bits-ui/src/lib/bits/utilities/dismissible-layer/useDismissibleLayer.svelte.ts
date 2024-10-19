@@ -191,7 +191,21 @@ export class DismissibleLayerState {
 		if (!this.currNode) return;
 
 		const isEventValid =
-			this.#isValidEventProp.current(e, this.currNode) || isValidEvent(e, this.currNode);
+			this.#isValidEventProp.current(e, this.currNode) ||
+			isValidInteractOutsideEvent(e, this.currNode);
+
+		const target = e.target as HTMLElement;
+		const currNodeContainsTarget = isOrContainsTarget(this.currNode, target);
+
+		if (!currNodeContainsTarget) {
+			let event = e;
+			if (event.defaultPrevented) {
+				event = createWrappedEvent(event);
+			}
+			this.#isPointerDownOutside = true;
+			this.#onInteractOutside(event);
+			return;
+		}
 
 		if (!this.#isResponsibleLayer || this.#isAnyEventIntercepted() || !isEventValid) {
 			return;
@@ -210,7 +224,8 @@ export class DismissibleLayerState {
 
 		const behaviorType = this.#behaviorType.current;
 		const isEventValid =
-			this.#isValidEventProp.current(e, this.currNode) || isValidEvent(e, this.currNode);
+			this.#isValidEventProp.current(e, this.currNode) ||
+			isValidInteractOutsideEvent(e, this.currNode);
 
 		if (!this.#isResponsibleLayer || this.#isAnyEventIntercepted() || !isEventValid) {
 			return;
@@ -286,12 +301,16 @@ function isResponsibleLayer(node: HTMLElement): boolean {
 	 * the first layer is the responsible one.
 	 */
 	const topMostLayer = getTopMostLayer(layersArr);
-	if (topMostLayer) return topMostLayer[0].node.current === node;
+	if (topMostLayer) {
+		const isResponsible = topMostLayer[0].node.current === node;
+		return isResponsible;
+	}
 	const [firstLayerNode] = layersArr[0]!;
-	return firstLayerNode.node.current === node;
+	const isResponsible = firstLayerNode.node.current === node;
+	return isResponsible;
 }
 
-function isValidEvent(e: InteractOutsideEvent, node: HTMLElement): boolean {
+function isValidInteractOutsideEvent(e: InteractOutsideEvent, node: HTMLElement): boolean {
 	if ("button" in e && e.button > 0) return false;
 	const target = e.target;
 	if (!isElement(target)) return false;

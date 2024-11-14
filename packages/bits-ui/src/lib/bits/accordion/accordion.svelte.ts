@@ -165,13 +165,21 @@ export class AccordionItemState {
 		this.root.toggleItem(this.value.current);
 	};
 
+	sharedProps = $derived.by(
+		() =>
+			({
+				"data-state": getDataOpenClosed(this.isActive),
+				"data-accordion-state": getDataOpenClosed(this.isActive),
+				"data-orientation": getDataOrientation(this.root.orientation.current),
+			}) as const
+	);
+
 	props = $derived.by(
 		() =>
 			({
 				id: this.#id.current,
-				"data-state": getDataOpenClosed(this.isActive),
+				...this.sharedProps,
 				"data-disabled": getDataDisabled(this.isDisabled),
-				"data-orientation": getDataOrientation(this.root.orientation.current),
 				[ACCORDION_ITEM_ATTR]: "",
 			}) as const
 	);
@@ -246,8 +254,7 @@ class AccordionTriggerState {
 				"aria-expanded": getAriaExpanded(this.#itemState.isActive),
 				"aria-disabled": getAriaDisabled(this.#isDisabled),
 				"data-disabled": getDataDisabled(this.#isDisabled),
-				"data-state": getDataOpenClosed(this.#itemState.isActive),
-				"data-orientation": getDataOrientation(this.#root.orientation.current),
+				...this.#itemState.sharedProps,
 				[ACCORDION_TRIGGER_ATTR]: "",
 				tabindex: 0,
 				//
@@ -340,9 +347,8 @@ class AccordionContentState {
 		() =>
 			({
 				id: this.#id.current,
-				"data-state": getDataOpenClosed(this.item.isActive),
 				"data-disabled": getDataDisabled(this.item.isDisabled),
-				"data-orientation": getDataOrientation(this.item.root.orientation.current),
+				...this.item.sharedProps,
 				[ACCORDION_CONTENT_ATTR]: "",
 				style: {
 					"--bits-accordion-content-height": `${this.#height}px`,
@@ -383,8 +389,7 @@ class AccordionHeaderState {
 				role: "heading",
 				"aria-level": this.#level.current,
 				"data-heading-level": this.#level.current,
-				"data-state": getDataOpenClosed(this.#item.isActive),
-				"data-orientation": getDataOrientation(this.#item.root.orientation.current),
+				...this.#item.sharedProps,
 				[ACCORDION_HEADER_ATTR]: "",
 			}) as const
 	);

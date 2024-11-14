@@ -42,6 +42,13 @@ const stateDataAttr = createEnumDataAttr({
 	definition: OpenClosedProp,
 });
 
+const accordionStateDataAttr = createEnumDataAttr({
+	name: "accordion-state",
+	description: "Whether the accordion item is open or closed.",
+	options: ["open", "closed"],
+	definition: OpenClosedProp,
+});
+
 const root = createApiSchema<AccordionRootPropsWithoutHTML>({
 	title: "Root",
 	description: "The root accordion component used to set and manage the state of the accordion.",
@@ -111,6 +118,7 @@ const item = createApiSchema<AccordionItemPropsWithoutHTML>({
 	},
 	dataAttributes: [
 		stateDataAttr,
+		accordionStateDataAttr,
 		disabledDataAttr,
 		orientationDataAttr,
 		createDataAttrSchema({
@@ -125,6 +133,8 @@ const trigger = createApiSchema<AccordionTriggerPropsWithoutHTML>({
 	description: "The button responsible for toggling the accordion item.",
 	props: withChildProps({ elType: "HTMLButtonElement" }),
 	dataAttributes: [
+		stateDataAttr,
+		accordionStateDataAttr,
 		orientationDataAttr,
 		disabledDataAttr,
 		createDataAttrSchema({
@@ -146,6 +156,8 @@ const content = createApiSchema<AccordionContentPropsWithoutHTML>({
 		}),
 	},
 	dataAttributes: [
+		stateDataAttr,
+		accordionStateDataAttr,
 		orientationDataAttr,
 		disabledDataAttr,
 		createDataAttrSchema({
@@ -179,6 +191,8 @@ const header = createApiSchema<AccordionHeaderPropsWithoutHTML>({
 		...withChildProps({ elType: "HTMLDivElement" }),
 	},
 	dataAttributes: [
+		stateDataAttr,
+		accordionStateDataAttr,
 		orientationDataAttr,
 		disabledDataAttr,
 		createEnumDataAttr({

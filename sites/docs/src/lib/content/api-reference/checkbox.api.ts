@@ -75,6 +75,12 @@ export const root = createApiSchema<CheckboxRootPropsWithoutHTML>({
 			description: "The checkbox's state of checked, unchecked, or indeterminate.",
 			definition: CheckboxRootStateDataAttr,
 		}),
+		createEnumDataAttr({
+			name: "checkbox-state",
+			options: ["checked", "unchecked", "indeterminate"],
+			description: "The checkbox's state of checked, unchecked, or indeterminate.",
+			definition: CheckboxRootStateDataAttr,
+		}),
 		createDataAttrSchema({
 			name: "disabled",
 			description: "Present when the checkbox is disabled.",

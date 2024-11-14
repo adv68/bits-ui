@@ -41,7 +41,7 @@ class AvatarRootState {
 		});
 	}
 
-	loadImage(src: string, crossorigin?: CrossOrigin, referrerPolicy?: ReferrerPolicy) {
+	loadImage = (src: string, crossorigin?: CrossOrigin, referrerPolicy?: ReferrerPolicy) => {
 		let imageTimerId: number;
 		const image = new Image();
 
@@ -61,7 +61,7 @@ class AvatarRootState {
 		return () => {
 			clearTimeout(imageTimerId);
 		};
-	}
+	};
 
 	props = $derived.by(
 		() =>

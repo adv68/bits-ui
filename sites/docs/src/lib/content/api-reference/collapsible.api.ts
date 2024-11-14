@@ -21,6 +21,20 @@ import {
 import { OnOpenChangeProp, OpenClosedProp } from "./extended-types/shared/index.js";
 import * as C from "$lib/content/constants.js";
 
+const stateDataAttr = createEnumDataAttr({
+	name: "state",
+	options: ["open", "closed"],
+	description: "The collapsible's open state.",
+	definition: OpenClosedProp,
+});
+
+const collapsibleStateDataAttr = createEnumDataAttr({
+	name: "collapsible-state",
+	options: ["open", "closed"],
+	description: "The collapsible's open state.",
+	definition: OpenClosedProp,
+});
+
 export const root = createApiSchema<CollapsibleRootPropsWithoutHTML>({
 	title: "Root",
 	description: "The root collapsible container which manages the state of the collapsible.",
@@ -45,12 +59,8 @@ export const root = createApiSchema<CollapsibleRootPropsWithoutHTML>({
 		...withChildProps({ elType: "HTMLDivElement" }),
 	},
 	dataAttributes: [
-		createEnumDataAttr({
-			name: "state",
-			options: ["open", "closed"],
-			description: "The collapsible's open state.",
-			definition: OpenClosedProp,
-		}),
+		stateDataAttr,
+		collapsibleStateDataAttr,
 		createDataAttrSchema({
 			name: "disabled",
 			description: "Present when the collapsible is disabled.",
@@ -67,12 +77,8 @@ export const trigger = createApiSchema<CollapsibleTriggerPropsWithoutHTML>({
 	description: "The button responsible for toggling the collapsible's open state.",
 	props: withChildProps({ elType: "HTMLButtonElement" }),
 	dataAttributes: [
-		createEnumDataAttr({
-			name: "state",
-			options: ["open", "closed"],
-			description: "The collapsible's open state.",
-			definition: OpenClosedProp,
-		}),
+		stateDataAttr,
+		collapsibleStateDataAttr,
 		createDataAttrSchema({
 			name: "disabled",
 			description: "Present when the collapsible or this trigger is disabled.",
@@ -96,12 +102,8 @@ export const content = createApiSchema<CollapsibleContentPropsWithoutHTML>({
 		}),
 	},
 	dataAttributes: [
-		createEnumDataAttr({
-			name: "state",
-			options: ["open", "closed"],
-			description: "The collapsible's open state.",
-			definition: OpenClosedProp,
-		}),
+		stateDataAttr,
+		collapsibleStateDataAttr,
 		createDataAttrSchema({
 			name: "disabled",
 			description: "Present when the collapsible is disabled.",

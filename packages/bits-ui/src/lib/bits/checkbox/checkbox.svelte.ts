@@ -83,6 +83,10 @@ class CheckboxRootState {
 					this.checked.current,
 					this.indeterminate.current
 				),
+				"data-checkbox-state": getCheckboxDataState(
+					this.checked.current,
+					this.indeterminate.current
+				),
 				[CHECKBOX_ROOT_ATTR]: "",
 				//
 				onclick: this.#onclick,

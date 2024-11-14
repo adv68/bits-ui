@@ -41,11 +41,19 @@ class CollapsibleRootState {
 		this.open.current = !this.open.current;
 	}
 
+	sharedProps = $derived.by(
+		() =>
+			({
+				"data-state": getDataOpenClosed(this.open.current),
+				"data-collapsible-state": getDataOpenClosed(this.open.current),
+			}) as const
+	);
+
 	props = $derived.by(
 		() =>
 			({
 				id: this.#id.current,
-				"data-state": getDataOpenClosed(this.open.current),
+				...this.sharedProps,
 				"data-disabled": getDataDisabled(this.disabled.current),
 				[COLLAPSIBLE_ROOT_ATTR]: "",
 			}) as const
@@ -146,7 +154,7 @@ class CollapsibleContentState {
 						? `${this.#width}px`
 						: undefined,
 				},
-				"data-state": getDataOpenClosed(this.root.open.current),
+				...this.root.sharedProps,
 				"data-disabled": getDataDisabled(this.root.disabled.current),
 				[COLLAPSIBLE_CONTENT_ATTR]: "",
 			}) as const
@@ -209,7 +217,7 @@ class CollapsibleTriggerState {
 				disabled: this.#isDisabled,
 				"aria-controls": this.#root.contentId,
 				"aria-expanded": getAriaExpanded(this.#root.open.current),
-				"data-state": getDataOpenClosed(this.#root.open.current),
+				...this.#root.sharedProps,
 				"data-disabled": getDataDisabled(this.#isDisabled),
 				[COLLAPSIBLE_TRIGGER_ATTR]: "",
 				//

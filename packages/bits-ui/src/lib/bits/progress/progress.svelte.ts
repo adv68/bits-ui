@@ -40,6 +40,7 @@ class ProgressRootState {
 				"aria-valuenow": this.#value.current,
 				"data-value": this.#value.current,
 				"data-state": getProgressDataState(this.#value.current, this.#max.current),
+				"data-progress-state": getProgressDataState(this.#value.current, this.#max.current),
 				"data-max": this.#max.current,
 				[ROOT_ATTR]: "",
 			}) as const

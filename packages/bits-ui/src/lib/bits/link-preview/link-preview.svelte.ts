@@ -114,6 +114,14 @@ class LinkPreviewRootState {
 			}, this.closeDelay.current);
 		}
 	};
+
+	sharedProps = $derived.by(
+		() =>
+			({
+				"data-state": getDataOpenClosed(this.open.current),
+				"data-link-preview-state": getDataOpenClosed(this.open.current),
+			}) as const
+	);
 }
 
 type LinkPreviewTriggerStateProps = WithRefProps;
@@ -164,7 +172,7 @@ class LinkPreviewTriggerState {
 				id: this.#id.current,
 				"aria-haspopup": "dialog",
 				"aria-expanded": getAriaExpanded(this.#root.open.current),
-				"data-state": getDataOpenClosed(this.#root.open.current),
+				...this.#root.sharedProps,
 				"aria-controls": this.#root.contentId,
 				role: "button",
 				[TRIGGER_ATTR]: "",
@@ -244,7 +252,7 @@ class LinkPreviewContentState {
 			({
 				id: this.#id.current,
 				tabindex: -1,
-				"data-state": getDataOpenClosed(this.root.open.current),
+				...this.root.sharedProps,
 				[CONTENT_ATTR]: "",
 				onpointerdown: this.#onpointerdown,
 				onpointerenter: this.#onpointerenter,

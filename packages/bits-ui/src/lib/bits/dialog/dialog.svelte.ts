@@ -60,6 +60,9 @@ class DialogRootState {
 		() =>
 			({
 				"data-state": getDataOpenClosed(this.open.current),
+				[this.variant.current === "alert-dialog"
+					? "data-alert-dialog-state"
+					: "data-dialog-state"]: getDataOpenClosed(this.open.current),
 			}) as const
 	);
 }

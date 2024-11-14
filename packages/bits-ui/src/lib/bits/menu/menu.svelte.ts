@@ -157,6 +157,14 @@ class MenuMenuState {
 	onClose = () => {
 		this.open.current = false;
 	};
+
+	sharedProps = $derived.by(
+		() =>
+			({
+				"data-state": getDataOpenClosed(this.open.current),
+				[`data-${this.root.variant.current}-state`]: getDataOpenClosed(this.open.current),
+			}) as const
+	);
 }
 
 type MenuContentStateProps = ReadableBoxedValues<{
@@ -354,7 +362,7 @@ class MenuContentState {
 				role: "menu",
 				"aria-orientation": getAriaOrientation("vertical"),
 				[this.parentMenu.root.getAttr("content")]: "",
-				"data-state": getDataOpenClosed(this.parentMenu.open.current),
+				...this.parentMenu.sharedProps,
 				onkeydown: this.#onkeydown,
 				onblur: this.#onblur,
 				onpointermove: this.#onpointermove,
@@ -636,6 +644,9 @@ class MenuSubTriggerState {
 				"aria-haspopup": "menu",
 				"aria-expanded": getAriaExpanded(this.#submenu.open.current),
 				"data-state": getDataOpenClosed(this.#submenu.open.current),
+				[`data-${this.#submenu.root.variant.current}-state`]: getDataOpenClosed(
+					this.#submenu.open.current
+				),
 				"aria-controls": this.#submenu.open.current
 					? this.#submenu.contentId.current
 					: undefined,
@@ -687,6 +698,9 @@ class MenuCheckboxItemState {
 				role: "menuitemcheckbox",
 				"aria-checked": getAriaChecked(this.#checked.current, this.#indeterminate.current),
 				"data-state": getCheckedState(this.#checked.current),
+				[`data-${this.#item.root.variant.current}-checkbox-state`]: getCheckedState(
+					this.#checked.current
+				),
 				[this.#item.root.getAttr("checkbox-item")]: "",
 			}) as const
 	);
@@ -883,6 +897,9 @@ class MenuRadioItemState {
 				role: "menuitemradio",
 				"aria-checked": getAriaChecked(this.isChecked, false),
 				"data-state": getCheckedState(this.isChecked),
+				[`data-${this.#item.root.variant.current}-radio-state`]: getCheckedState(
+					this.isChecked
+				),
 			}) as const
 	);
 }
@@ -968,7 +985,7 @@ class DropdownMenuTriggerState {
 				"aria-expanded": getAriaExpanded(this.#parentMenu.open.current),
 				"aria-controls": this.#ariaControls,
 				"data-disabled": getDataDisabled(this.#disabled.current),
-				"data-state": getDataOpenClosed(this.#parentMenu.open.current),
+				...this.#parentMenu.sharedProps,
 				[this.#parentMenu.root.getAttr("trigger")]: "",
 				//
 				onpointerdown: this.#onpointerdown,
@@ -1080,7 +1097,7 @@ class ContextMenuTriggerState {
 				id: this.#id.current,
 				disabled: this.#disabled.current,
 				"data-disabled": getDataDisabled(this.#disabled.current),
-				"data-state": getDataOpenClosed(this.#parentMenu.open.current),
+				...this.#parentMenu.sharedProps,
 				[CONTEXT_MENU_TRIGGER_ATTR]: "",
 				//
 				onpointerdown: this.#onpointerdown,

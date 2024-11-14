@@ -250,6 +250,7 @@ class MenubarTriggerState {
 				"aria-controls": this.menu.open ? this.menu.contentNode?.id : undefined,
 				"data-highlighted": this.isFocused ? "" : undefined,
 				"data-state": getDataOpenClosed(this.menu.open),
+				"data-menubar-state": getDataOpenClosed(this.menu.open),
 				"data-disabled": getDataDisabled(this.disabled.current),
 				"data-menu-value": this.menu.value.current,
 				disabled: this.disabled.current ? true : undefined,
@@ -350,18 +351,24 @@ class MenubarContentState {
 		if (nextValue) this.root.onMenuOpen(nextValue);
 	};
 
-	props = $derived.by(() => ({
-		id: this.id.current,
-		"aria-labelledby": this.menu.triggerNode?.id,
-		style: {
-			"--bits-menubar-content-transform-origin": "var(--bits-floating-transform-origin)",
-			"--bits-menubar-content-available-width": "var(--bits-floating-available-width)",
-			"--bits-menubar-content-available-height": "var(--bits-floating-available-height)",
-			"--bits-menubar-anchor-width": "var(--bits-floating-anchor-width)",
-			"--bits-menubar-anchor-height": "var(--bits-floating-anchor-height)",
-		},
-		onkeydown: this.#onkeydown,
-	}));
+	props = $derived.by(
+		() =>
+			({
+				id: this.id.current,
+				"aria-labelledby": this.menu.triggerNode?.id,
+				style: {
+					"--bits-menubar-content-transform-origin":
+						"var(--bits-floating-transform-origin)",
+					"--bits-menubar-content-available-width":
+						"var(--bits-floating-available-width)",
+					"--bits-menubar-content-available-height":
+						"var(--bits-floating-available-height)",
+					"--bits-menubar-anchor-width": "var(--bits-floating-anchor-width)",
+					"--bits-menubar-anchor-height": "var(--bits-floating-anchor-height)",
+				},
+				onkeydown: this.#onkeydown,
+			}) as const
+	);
 }
 
 const [setMenubarRootContext, getMenubarRootContext] =

@@ -228,6 +228,7 @@ class ScrollAreaScrollbarHoverState {
 		() =>
 			({
 				"data-state": this.isVisible ? "visible" : "hidden",
+				"data-scrollbar-state": this.isVisible ? "visible" : "hidden",
 			}) as const
 	);
 }
@@ -308,6 +309,8 @@ class ScrollAreaScrollbarScrollState {
 		() =>
 			({
 				"data-state": this.machine.state.current === "hidden" ? "hidden" : "visible",
+				"data-scrollbar-state":
+					this.machine.state.current === "hidden" ? "hidden" : "visible",
 				onpointerenter: this.#onpointerenter,
 				onpointerleave: this.#onpointerleave,
 			}) as const
@@ -339,6 +342,7 @@ class ScrollAreaScrollbarAutoState {
 		() =>
 			({
 				"data-state": this.isVisible ? "visible" : "hidden",
+				"data-scrollbar-state": this.isVisible ? "visible" : "hidden",
 			}) as const
 	);
 }
@@ -838,6 +842,7 @@ class ScrollAreaThumbImplState {
 			({
 				id: this.#id.current,
 				"data-state": this.#scrollbarState.scrollbarVis.hasThumb ? "visible" : "hidden",
+				"data-scrollbar-thumb-state": this.#scrollbarState.scrollbarVis.hasThumb,
 				style: {
 					width: "var(--bits-scroll-area-thumb-width)",
 					height: "var(--bits-scroll-area-thumb-height)",
@@ -889,18 +894,21 @@ class ScrollAreaCornerImplState {
 		});
 	}
 
-	props = $derived.by(() => ({
-		id: this.#id.current,
-		style: {
-			width: this.#width,
-			height: this.#height,
-			position: "absolute",
-			right: this.#root.dir.current === "ltr" ? 0 : undefined,
-			left: this.#root.dir.current === "rtl" ? 0 : undefined,
-			bottom: 0,
-		},
-		[SCROLL_AREA_CORNER_ATTR]: "",
-	}));
+	props = $derived.by(
+		() =>
+			({
+				id: this.#id.current,
+				style: {
+					width: this.#width,
+					height: this.#height,
+					position: "absolute",
+					right: this.#root.dir.current === "ltr" ? 0 : undefined,
+					left: this.#root.dir.current === "rtl" ? 0 : undefined,
+					bottom: 0,
+				},
+				[SCROLL_AREA_CORNER_ATTR]: "",
+			}) as const
+	);
 }
 
 export const [setScrollAreaRootContext, getScrollAreaRootContext] =

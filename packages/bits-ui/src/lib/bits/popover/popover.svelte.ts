@@ -27,6 +27,14 @@ class PopoverRootState {
 		if (!this.open.current) return;
 		this.open.current = false;
 	};
+
+	sharedProps = $derived.by(
+		() =>
+			({
+				"data-state": getDataOpenClosed(this.open.current),
+				"data-popover-state": getDataOpenClosed(this.open.current),
+			}) as const
+	);
 }
 
 type PopoverTriggerStateProps = WithRefProps & ReadableBoxedValues<{ disabled: boolean }>;
@@ -86,7 +94,7 @@ class PopoverTriggerState {
 				id: this.#id.current,
 				"aria-haspopup": "dialog",
 				"aria-expanded": getAriaExpanded(this.#root.open.current),
-				"data-state": getDataOpenClosed(this.#root.open.current),
+				...this.#root.sharedProps,
 				"aria-controls": this.#getAriaControls(),
 				"data-popover-trigger": "",
 				disabled: this.#disabled.current,
@@ -122,15 +130,18 @@ class PopoverContentState {
 
 	snippetProps = $derived.by(() => ({ open: this.root.open.current }));
 
-	props = $derived.by(() => ({
-		id: this.#id.current,
-		tabindex: -1,
-		"data-state": getDataOpenClosed(this.root.open.current),
-		"data-popover-content": "",
-		style: {
-			pointerEvents: "auto",
-		},
-	}));
+	props = $derived.by(
+		() =>
+			({
+				id: this.#id.current,
+				tabindex: -1,
+				...this.root.sharedProps,
+				"data-popover-content": "",
+				style: {
+					pointerEvents: "auto",
+				},
+			}) as const
+	);
 }
 
 type PopoverCloseStateProps = WithRefProps;
@@ -152,16 +163,8 @@ class PopoverCloseState {
 		});
 	}
 
-	#onpointerdown = (e: PointerEvent) => {
-		if (e.pointerType === "touch") return e.preventDefault();
+	#onclick = (e: PointerEvent) => {
 		this.#root.close();
-	};
-
-	#onpointerup = (e: PointerEvent) => {
-		e.preventDefault();
-		if (e.pointerType === "touch") {
-			this.#root.close();
-		}
 	};
 
 	#onkeydown = (e: KeyboardEvent) => {
@@ -174,7 +177,7 @@ class PopoverCloseState {
 		() =>
 			({
 				id: this.#id.current,
-				onclick: this.#onpointerdown,
+				onclick: this.#onclick,
 				onkeydown: this.#onkeydown,
 				type: "button",
 				"data-popover-close": "",

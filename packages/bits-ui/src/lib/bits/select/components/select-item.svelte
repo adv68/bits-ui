@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="T extends string | number">
 	import { box, mergeProps } from "svelte-toolbelt";
 	import { useSelectItem } from "../select.svelte.js";
 	import type { SelectItemProps } from "../types.js";
@@ -10,14 +10,14 @@
 		id = useId(),
 		ref = $bindable(null),
 		value,
-		label = value,
+		label = value.toString(),
 		disabled = false,
 		children,
 		child,
 		onHighlight = noop,
 		onUnhighlight = noop,
 		...restProps
-	}: SelectItemProps = $props();
+	}: SelectItemProps<T> = $props();
 
 	const itemState = useSelectItem({
 		id: box.with(() => id),

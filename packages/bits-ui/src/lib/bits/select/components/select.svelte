@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="T extends string | number">
 	import { type WritableBox, box } from "svelte-toolbelt";
 	import { useSelectRoot } from "../select.svelte.js";
 	import type { SelectRootProps } from "../types.js";
@@ -22,10 +22,10 @@
 		items = [],
 		allowDeselect = true,
 		children,
-	}: SelectRootProps = $props();
+	}: SelectRootProps<T> = $props();
 
 	if (value === undefined) {
-		const defaultValue = type === "single" ? "" : [];
+		const defaultValue = type === "single" ? undefined : [];
 		if (controlledValue) {
 			onValueChange(defaultValue as any);
 		} else {
@@ -45,7 +45,7 @@
 					onValueChange(v as any);
 				}
 			}
-		) as WritableBox<string> | WritableBox<string[]>,
+		) as WritableBox<T> | WritableBox<T[]>,
 		disabled: box.with(() => disabled),
 		required: box.with(() => required),
 		open: box.with(

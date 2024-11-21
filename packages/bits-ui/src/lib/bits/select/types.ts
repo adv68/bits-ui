@@ -14,7 +14,7 @@ import type {
 	Without,
 } from "$lib/internal/types.js";
 
-export type SelectBaseRootPropsWithoutHTML = WithChildren<{
+export type SelectBaseRootPropsWithoutHTML<T extends string | number> = WithChildren<{
 	/**
 	 * Whether the combobox is disabled.
 	 *
@@ -98,7 +98,7 @@ export type SelectBaseRootPropsWithoutHTML = WithChildren<{
 	 *
 	 * IMPORTANT: This functionality is only available for single-select listboxes.
 	 */
-	items?: { value: string; label: string; disabled?: boolean }[];
+	items?: { value: T; label: string; disabled?: boolean }[];
 
 	/**
 	 * Whether to allow the user to deselect an item by clicking on an already selected item.
@@ -107,18 +107,18 @@ export type SelectBaseRootPropsWithoutHTML = WithChildren<{
 	allowDeselect?: boolean;
 }>;
 
-export type SelectSingleRootPropsWithoutHTML = {
+export type SelectSingleRootPropsWithoutHTML<T extends string | number> = {
 	/**
 	 * The value of the selected combobox item.
 	 *
 	 * @bindable
 	 */
-	value?: string;
+	value?: T;
 
 	/**
 	 * A callback function called when the value changes.
 	 */
-	onValueChange?: OnChangeFn<string>;
+	onValueChange?: OnChangeFn<T>;
 
 	/**
 	 * The type of combobox.
@@ -128,18 +128,18 @@ export type SelectSingleRootPropsWithoutHTML = {
 	type: "single";
 };
 
-export type SelectMultipleRootPropsWithoutHTML = {
+export type SelectMultipleRootPropsWithoutHTML<T extends string | number> = {
 	/**
 	 * The value of the selected combobox item.
 	 *
 	 * @bindable
 	 */
-	value?: string[];
+	value?: T[];
 
 	/**
 	 * A callback function called when the value changes.
 	 */
-	onValueChange?: OnChangeFn<string[]>;
+	onValueChange?: OnChangeFn<T[]>;
 
 	/**
 	 * The type of combobox.
@@ -149,24 +149,24 @@ export type SelectMultipleRootPropsWithoutHTML = {
 	type: "multiple";
 };
 
-export type SelectSingleRootProps = SelectBaseRootPropsWithoutHTML &
-	SelectSingleRootPropsWithoutHTML &
+export type SelectSingleRootProps<T extends string | number> = SelectBaseRootPropsWithoutHTML<T> &
+	SelectSingleRootPropsWithoutHTML<T> &
 	Without<
 		BitsPrimitiveDivAttributes,
-		SelectSingleRootPropsWithoutHTML | SelectBaseRootPropsWithoutHTML
+		SelectSingleRootPropsWithoutHTML<T> | SelectBaseRootPropsWithoutHTML<T>
 	>;
 
-export type SelectMultipleRootProps = SelectBaseRootPropsWithoutHTML &
-	SelectMultipleRootPropsWithoutHTML &
+export type SelectMultipleRootProps<T extends string | number> = SelectBaseRootPropsWithoutHTML<T> &
+	SelectMultipleRootPropsWithoutHTML<T> &
 	Without<
 		BitsPrimitiveDivAttributes,
-		SelectMultipleRootPropsWithoutHTML | SelectBaseRootPropsWithoutHTML
+		SelectMultipleRootPropsWithoutHTML<T> | SelectBaseRootPropsWithoutHTML<T>
 	>;
 
-export type SelectRootPropsWithoutHTML = SelectBaseRootPropsWithoutHTML &
-	(SelectSingleRootPropsWithoutHTML | SelectMultipleRootPropsWithoutHTML);
+export type SelectRootPropsWithoutHTML<T extends string | number> = SelectBaseRootPropsWithoutHTML<T> &
+	(SelectSingleRootPropsWithoutHTML<T> | SelectMultipleRootPropsWithoutHTML<T>);
 
-export type SelectRootProps = SelectRootPropsWithoutHTML;
+export type SelectRootProps<T extends string | number> = SelectRootPropsWithoutHTML<T>;
 
 export type _SharedSelectContentProps = {
 	/**
@@ -214,14 +214,14 @@ export type SelectTriggerProps = SelectTriggerPropsWithoutHTML &
 
 export type SelectItemSnippetProps = { selected: boolean; highlighted: boolean };
 
-export type SelectItemPropsWithoutHTML = WithChild<
+export type SelectItemPropsWithoutHTML<T extends string | number> = WithChild<
 	{
 		/**
 		 * The value of the item.
 		 *
 		 * @required
 		 */
-		value: string;
+		value: T;
 
 		/**
 		 * The label of the item. If provided, this is the item that users will search for.
@@ -253,8 +253,8 @@ export type SelectItemPropsWithoutHTML = WithChild<
 	SelectItemSnippetProps
 >;
 
-export type SelectItemProps = SelectItemPropsWithoutHTML &
-	Without<BitsPrimitiveDivAttributes, SelectItemPropsWithoutHTML>;
+export type SelectItemProps<T extends string | number> = SelectItemPropsWithoutHTML<T> &
+	Without<BitsPrimitiveDivAttributes, SelectItemPropsWithoutHTML<T>>;
 
 export type SelectGroupPropsWithoutHTML = WithChild;
 

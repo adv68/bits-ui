@@ -29,13 +29,13 @@ export const SELECTION_KEYS = [kbd.ENTER, kbd.SPACE];
 
 export const CONTENT_MARGIN = 10;
 
-type SelectBaseRootStateProps = ReadableBoxedValues<{
+type SelectBaseRootStateProps<T extends number | string> = ReadableBoxedValues<{
 	disabled: boolean;
 	required: boolean;
 	name: string;
 	loop: boolean;
 	scrollAlignment: "nearest" | "center";
-	items: { value: string; label: string; disabled?: boolean }[];
+	items: { value: T; label: string; disabled?: boolean }[];
 	allowDeselect: boolean;
 }> &
 	WritableBoxedValues<{
@@ -44,15 +44,15 @@ type SelectBaseRootStateProps = ReadableBoxedValues<{
 		isCombobox: boolean;
 	};
 
-class SelectBaseRootState {
-	disabled: SelectBaseRootStateProps["disabled"];
-	required: SelectBaseRootStateProps["required"];
-	name: SelectBaseRootStateProps["name"];
-	loop: SelectBaseRootStateProps["loop"];
-	open: SelectBaseRootStateProps["open"];
-	scrollAlignment: SelectBaseRootStateProps["scrollAlignment"];
-	items: SelectBaseRootStateProps["items"];
-	allowDeselect: SelectBaseRootStateProps["allowDeselect"];
+class SelectBaseRootState<T extends string | number> {
+	disabled: SelectBaseRootStateProps<T>["disabled"];
+	required: SelectBaseRootStateProps<T>["required"];
+	name: SelectBaseRootStateProps<T>["name"];
+	loop: SelectBaseRootStateProps<T>["loop"];
+	open: SelectBaseRootStateProps<T>["open"];
+	scrollAlignment: SelectBaseRootStateProps<T>["scrollAlignment"];
+	items: SelectBaseRootStateProps<T>["items"];
+	allowDeselect: SelectBaseRootStateProps<T>["allowDeselect"];
 	touchedInput = $state(false);
 	inputValue = $state<string>("");
 	inputNode = $state<HTMLElement | null>(null);
@@ -77,7 +77,7 @@ class SelectBaseRootState {
 	bitsAttrs: SelectBitsAttrs;
 	triggerPointerDownPos = $state.raw<{ x: number; y: number } | null>({ x: 0, y: 0 });
 
-	constructor(props: SelectBaseRootStateProps) {
+	constructor(props: SelectBaseRootStateProps<T>) {
 		this.disabled = props.disabled;
 		this.required = props.required;
 		this.name = props.name;
@@ -149,13 +149,13 @@ class SelectBaseRootState {
 	};
 }
 
-type SelectSingleRootStateProps = SelectBaseRootStateProps &
+type SelectSingleRootStateProps<T extends string | number> = SelectBaseRootStateProps<T> &
 	WritableBoxedValues<{
-		value: string;
+		value: T;
 	}>;
 
-class SelectSingleRootState extends SelectBaseRootState {
-	value: SelectSingleRootStateProps["value"];
+class SelectSingleRootState<T extends string | number> extends SelectBaseRootState<T> {
+	value: SelectSingleRootStateProps<T>["value"];
 	isMulti = false as const;
 	hasValue = $derived.by(() => this.value.current !== "");
 	currentLabel = $derived.by(() => {
@@ -174,7 +174,7 @@ class SelectSingleRootState extends SelectBaseRootState {
 		return true;
 	});
 
-	constructor(props: SelectSingleRootStateProps) {
+	constructor(props: SelectSingleRootStateProps<T>) {
 		super(props);
 		this.value = props.value;
 
@@ -192,11 +192,11 @@ class SelectSingleRootState extends SelectBaseRootState {
 		});
 	}
 
-	includesItem = (itemValue: string) => {
+	includesItem = (itemValue: T) => {
 		return this.value.current === itemValue;
 	};
 
-	toggleItem = (itemValue: string, itemLabel: string = itemValue) => {
+	toggleItem = (itemValue: T, itemLabel: string = itemValue.toString()) => {
 		this.value.current = this.includesItem(itemValue) ? "" : itemValue;
 		this.inputValue = itemLabel;
 	};
@@ -204,7 +204,7 @@ class SelectSingleRootState extends SelectBaseRootState {
 	setInitialHighlightedNode = () => {
 		if (this.highlightedNode && document.contains(this.highlightedNode)) return;
 		if (this.value.current !== "") {
-			const node = this.getNodeByValue(this.value.current);
+			const node = this.getNodeByValue(this.value.current.toString());
 			if (node) {
 				this.setHighlightedNode(node);
 				return;
@@ -217,17 +217,17 @@ class SelectSingleRootState extends SelectBaseRootState {
 	};
 }
 
-type SelectMultipleRootStateProps = SelectBaseRootStateProps &
+type SelectMultipleRootStateProps<T extends string | number> = SelectBaseRootStateProps<T> &
 	WritableBoxedValues<{
-		value: string[];
+		value: T[];
 	}>;
 
-class SelectMultipleRootState extends SelectBaseRootState {
-	value: SelectMultipleRootStateProps["value"];
+class SelectMultipleRootState<T extends string | number> extends SelectBaseRootState<T> {
+	value: SelectMultipleRootStateProps<T>["value"];
 	isMulti = true as const;
 	hasValue = $derived.by(() => this.value.current.length > 0);
 
-	constructor(props: SelectMultipleRootStateProps) {
+	constructor(props: SelectMultipleRootStateProps<T>) {
 		super(props);
 		this.value = props.value;
 
@@ -241,11 +241,11 @@ class SelectMultipleRootState extends SelectBaseRootState {
 		});
 	}
 
-	includesItem = (itemValue: string) => {
+	includesItem = (itemValue: T) => {
 		return this.value.current.includes(itemValue);
 	};
 
-	toggleItem = (itemValue: string, itemLabel: string = itemValue) => {
+	toggleItem = (itemValue: T, itemLabel: string = itemValue.toString()) => {
 		if (this.includesItem(itemValue)) {
 			this.value.current = this.value.current.filter((v) => v !== itemValue);
 		} else {
@@ -257,7 +257,7 @@ class SelectMultipleRootState extends SelectBaseRootState {
 	setInitialHighlightedNode = () => {
 		if (this.highlightedNode) return;
 		if (this.value.current.length && this.value.current[0] !== "") {
-			const node = this.getNodeByValue(this.value.current[0]!);
+			const node = this.getNodeByValue(this.value.current[0]!.toString());
 			if (node) {
 				this.setHighlightedNode(node);
 				return;
@@ -270,16 +270,16 @@ class SelectMultipleRootState extends SelectBaseRootState {
 	};
 }
 
-type SelectRootState = SelectSingleRootState | SelectMultipleRootState;
+type SelectRootState<T extends string | number> = SelectSingleRootState<T> | SelectMultipleRootState<T>;
 
 type SelectInputStateProps = WithRefProps;
 
-class SelectInputState {
+class SelectInputState<T extends string | number> {
 	#id: SelectInputStateProps["id"];
 	#ref: SelectInputStateProps["ref"];
-	root: SelectRootState;
+	root: SelectRootState<T>;
 
-	constructor(props: SelectInputStateProps, root: SelectRootState) {
+	constructor(props: SelectInputStateProps, root: SelectRootState<T>) {
 		this.root = root;
 		this.#id = props.id;
 		this.#ref = props.ref;
@@ -415,12 +415,12 @@ class SelectInputState {
 
 type SelectComboTriggerStateProps = WithRefProps;
 
-class SelectComboTriggerState {
+class SelectComboTriggerState<T extends string | number> {
 	#id: SelectComboTriggerStateProps["id"];
 	#ref: SelectComboTriggerStateProps["ref"];
-	root: SelectBaseRootState;
+	root: SelectBaseRootState<T>;
 
-	constructor(props: SelectComboTriggerStateProps, root: SelectBaseRootState) {
+	constructor(props: SelectComboTriggerStateProps, root: SelectBaseRootState<T>) {
 		this.root = root;
 		this.#id = props.id;
 		this.#ref = props.ref;
@@ -471,14 +471,14 @@ class SelectComboTriggerState {
 
 type SelectTriggerStateProps = WithRefProps;
 
-class SelectTriggerState {
+class SelectTriggerState<T extends string | number> {
 	#id: SelectTriggerStateProps["id"];
 	#ref: SelectTriggerStateProps["ref"];
-	root: SelectRootState;
+	root: SelectRootState<T>;
 	#domTypeahead: DOMTypeahead;
 	#dataTypeahead: DataTypeahead;
 
-	constructor(props: SelectTriggerStateProps, root: SelectRootState) {
+	constructor(props: SelectTriggerStateProps, root: SelectRootState<T>) {
 		this.root = root;
 		this.#id = props.id;
 		this.#ref = props.ref;
@@ -706,14 +706,14 @@ class SelectTriggerState {
 
 type SelectContentStateProps = WithRefProps;
 
-class SelectContentState {
+class SelectContentState<T extends string | number> {
 	id: SelectContentStateProps["id"];
 	ref: SelectContentStateProps["ref"];
 	viewportNode = $state<HTMLElement | null>(null);
-	root: SelectRootState;
+	root: SelectRootState<T>;
 	isPositioned = $state(false);
 
-	constructor(props: SelectContentStateProps, root: SelectRootState) {
+	constructor(props: SelectContentStateProps, root: SelectRootState<T>) {
 		this.root = root;
 		this.id = props.id;
 		this.ref = props.ref;
@@ -792,9 +792,9 @@ class SelectContentState {
 	);
 }
 
-type SelectItemStateProps = WithRefProps<
+type SelectItemStateProps<T extends string | number> = WithRefProps<
 	ReadableBoxedValues<{
-		value: string;
+		value: T;
 		disabled: boolean;
 		label: string;
 		onHighlight: () => void;
@@ -802,22 +802,22 @@ type SelectItemStateProps = WithRefProps<
 	}>
 >;
 
-class SelectItemState {
-	#id: SelectItemStateProps["id"];
-	#ref: SelectItemStateProps["ref"];
-	root: SelectRootState;
-	value: SelectItemStateProps["value"];
-	label: SelectItemStateProps["label"];
-	onHighlight: SelectItemStateProps["onHighlight"];
-	onUnhighlight: SelectItemStateProps["onUnhighlight"];
-	disabled: SelectItemStateProps["disabled"];
+class SelectItemState<T extends string | number> {
+	#id: SelectItemStateProps<T>["id"];
+	#ref: SelectItemStateProps<T>["ref"];
+	root: SelectRootState<T>;
+	value: SelectItemStateProps<T>["value"];
+	label: SelectItemStateProps<T>["label"];
+	onHighlight: SelectItemStateProps<T>["onHighlight"];
+	onUnhighlight: SelectItemStateProps<T>["onUnhighlight"];
+	disabled: SelectItemStateProps<T>["disabled"];
 	isSelected = $derived.by(() => this.root.includesItem(this.value.current));
 	isHighlighted = $derived.by(() => this.root.highlightedValue === this.value.current);
 	prevHighlighted = new Previous(() => this.isHighlighted);
 	textId = $state("");
 	mounted = $state(false);
 
-	constructor(props: SelectItemStateProps, root: SelectRootState) {
+	constructor(props: SelectItemStateProps<T>, root: SelectRootState<T>) {
 		this.root = root;
 		this.value = props.value;
 		this.disabled = props.disabled;
@@ -915,13 +915,13 @@ class SelectItemState {
 
 type SelectGroupStateProps = WithRefProps;
 
-class SelectGroupState {
+class SelectGroupState<T extends string | number> {
 	#id: SelectGroupStateProps["id"];
 	#ref: SelectGroupStateProps["ref"];
-	root: SelectBaseRootState;
+	root: SelectBaseRootState<T>;
 	labelNode = $state<HTMLElement | null>(null);
 
-	constructor(props: SelectGroupStateProps, root: SelectBaseRootState) {
+	constructor(props: SelectGroupStateProps, root: SelectBaseRootState<T>) {
 		this.#id = props.id;
 		this.#ref = props.ref;
 		this.root = root;
@@ -945,12 +945,12 @@ class SelectGroupState {
 
 type SelectGroupHeadingStateProps = WithRefProps;
 
-class SelectGroupHeadingState {
+class SelectGroupHeadingState<T extends string | number> {
 	#id: SelectGroupHeadingStateProps["id"];
 	#ref: SelectGroupHeadingStateProps["ref"];
-	group: SelectGroupState;
+	group: SelectGroupState<T>;
 
-	constructor(props: SelectGroupHeadingStateProps, group: SelectGroupState) {
+	constructor(props: SelectGroupHeadingStateProps, group: SelectGroupState<T>) {
 		this.#id = props.id;
 		this.#ref = props.ref;
 		this.group = group;
@@ -977,12 +977,12 @@ type SelectHiddenInputStateProps = ReadableBoxedValues<{
 	value: string;
 }>;
 
-class SelectHiddenInputState {
+class SelectHiddenInputState<T extends string | number> {
 	#value: SelectHiddenInputStateProps["value"];
-	root: SelectBaseRootState;
+	root: SelectBaseRootState<T>;
 	shouldRender = $derived.by(() => this.root.name.current !== "");
 
-	constructor(props: SelectHiddenInputStateProps, root: SelectBaseRootState) {
+	constructor(props: SelectHiddenInputStateProps, root: SelectBaseRootState<T>) {
 		this.root = root;
 		this.#value = props.value;
 	}
@@ -1013,14 +1013,14 @@ class SelectHiddenInputState {
 
 type SelectViewportStateProps = WithRefProps;
 
-class SelectViewportState {
+class SelectViewportState<T extends string | number> {
 	#id: SelectViewportStateProps["id"];
 	#ref: SelectViewportStateProps["ref"];
-	root: SelectBaseRootState;
-	content: SelectContentState;
+	root: SelectBaseRootState<T>;
+	content: SelectContentState<T>;
 	prevScrollTop = $state(0);
 
-	constructor(props: SelectViewportStateProps, content: SelectContentState) {
+	constructor(props: SelectViewportStateProps, content: SelectContentState<T>) {
 		this.#id = props.id;
 		this.#ref = props.ref;
 		this.content = content;
@@ -1056,16 +1056,16 @@ class SelectViewportState {
 
 type SelectScrollButtonImplStateProps = WithRefProps<ReadableBoxedValues<{ mounted: boolean }>>;
 
-class SelectScrollButtonImplState {
+class SelectScrollButtonImplState<T extends string | number> {
 	id: SelectScrollButtonImplStateProps["id"];
 	ref: SelectScrollButtonImplStateProps["ref"];
-	content: SelectContentState;
-	root: SelectBaseRootState;
+	content: SelectContentState<T>;
+	root: SelectBaseRootState<T>;
 	autoScrollTimer = $state<number | null>(null);
 	onAutoScroll: () => void = noop;
 	mounted: SelectScrollButtonImplStateProps["mounted"];
 
-	constructor(props: SelectScrollButtonImplStateProps, content: SelectContentState) {
+	constructor(props: SelectScrollButtonImplStateProps, content: SelectContentState<T>) {
 		this.ref = props.ref;
 		this.id = props.id;
 		this.mounted = props.mounted;
@@ -1124,13 +1124,13 @@ class SelectScrollButtonImplState {
 	);
 }
 
-class SelectScrollDownButtonState {
-	state: SelectScrollButtonImplState;
-	content: SelectContentState;
-	root: SelectBaseRootState;
+class SelectScrollDownButtonState<T extends string | number> {
+	state: SelectScrollButtonImplState<T>;
+	content: SelectContentState<T>;
+	root: SelectBaseRootState<T>;
 	canScrollDown = $state(false);
 
-	constructor(state: SelectScrollButtonImplState) {
+	constructor(state: SelectScrollButtonImplState<T>) {
 		this.state = state;
 		this.content = state.content;
 		this.root = state.root;
@@ -1183,13 +1183,13 @@ class SelectScrollDownButtonState {
 	);
 }
 
-class SelectScrollUpButtonState {
-	state: SelectScrollButtonImplState;
-	content: SelectContentState;
-	root: SelectBaseRootState;
+class SelectScrollUpButtonState<T extends string | number> {
+	state: SelectScrollButtonImplState<T>;
+	content: SelectContentState<T>;
+	root: SelectBaseRootState<T>;
 	canScrollUp = $state(false);
 
-	constructor(state: SelectScrollButtonImplState) {
+	constructor(state: SelectScrollButtonImplState<T>) {
 		this.state = state;
 		this.content = state.content;
 		this.root = state.root;
@@ -1235,16 +1235,16 @@ class SelectScrollUpButtonState {
 	);
 }
 
-type InitSelectProps = {
+type InitSelectProps<T extends string | number> = {
 	type: "single" | "multiple";
-	value: Box<string> | Box<string[]>;
+	value: Box<T> | Box<T[]>;
 } & ReadableBoxedValues<{
 	disabled: boolean;
 	required: boolean;
 	loop: boolean;
 	scrollAlignment: "nearest" | "center";
 	name: string;
-	items: { value: string; label: string; disabled?: boolean }[];
+	items: { value: T; label: string; disabled?: boolean }[];
 	allowDeselect: boolean;
 }> &
 	WritableBoxedValues<{
@@ -1253,28 +1253,28 @@ type InitSelectProps = {
 		isCombobox: boolean;
 	};
 
-const [setSelectRootContext, getSelectRootContext] = createContext<SelectRootState>([
+const [setSelectRootContext, getSelectRootContext] = createContext<SelectRootState<any>>([
 	"Select.Root",
 	"Combobox.Root",
 ]);
 
-const [setSelectGroupContext, getSelectGroupContext] = createContext<SelectGroupState>([
+const [setSelectGroupContext, getSelectGroupContext] = createContext<SelectGroupState<any>>([
 	"Select.Group",
 	"Combobox.Group",
 ]);
 
-const [setSelectContentContext, getSelectContentContext] = createContext<SelectContentState>([
+const [setSelectContentContext, getSelectContentContext] = createContext<SelectContentState<any>>([
 	"Select.Content",
 	"Combobox.Content",
 ]);
 
-export function useSelectRoot(props: InitSelectProps) {
+export function useSelectRoot<T extends string | number>(props: InitSelectProps<T>) {
 	const { type, ...rest } = props;
 
 	const rootState =
 		type === "single"
-			? new SelectSingleRootState(rest as SelectSingleRootStateProps)
-			: new SelectMultipleRootState(rest as SelectMultipleRootStateProps);
+			? new SelectSingleRootState(rest as SelectSingleRootStateProps<T>)
+			: new SelectMultipleRootState(rest as SelectMultipleRootStateProps<T>);
 
 	return setSelectRootContext(rootState);
 }
@@ -1295,7 +1295,7 @@ export function useSelectComboTrigger(props: SelectComboTriggerStateProps) {
 	return new SelectComboTriggerState(props, getSelectRootContext());
 }
 
-export function useSelectItem(props: SelectItemStateProps) {
+export function useSelectItem<T extends string | number>(props: SelectItemStateProps<T>) {
 	return new SelectItemState(props, getSelectRootContext());
 }
 
@@ -1350,7 +1350,7 @@ const selectParts = [
 
 type SelectBitsAttrs = Record<(typeof selectParts)[number], string>;
 
-export function getSelectBitsAttrs(root: SelectBaseRootState): SelectBitsAttrs {
+export function getSelectBitsAttrs<T extends string | number>(root: SelectBaseRootState<T>): SelectBitsAttrs {
 	const isCombobox = root.isCombobox;
 	const attrObj = {} as SelectBitsAttrs;
 	for (const part of selectParts) {

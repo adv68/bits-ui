@@ -60,9 +60,9 @@ class SelectBaseRootState<T extends string | number> {
 	triggerNode = $state<HTMLElement | null>(null);
 	valueId = $state("");
 	highlightedNode = $state<HTMLElement | null>(null);
-	highlightedValue = $derived.by(() => {
+	highlightedValue = $derived.by<T | null>(() => {
 		if (!this.highlightedNode) return null;
-		return this.highlightedNode.getAttribute("data-value");
+		return this.highlightedNode.getAttribute("data-value") as T; // TODO Type cast might not work
 	});
 	highlightedId = $derived.by(() => {
 		if (!this.highlightedNode) return undefined;
@@ -151,13 +151,13 @@ class SelectBaseRootState<T extends string | number> {
 
 type SelectSingleRootStateProps<T extends string | number> = SelectBaseRootStateProps<T> &
 	WritableBoxedValues<{
-		value: T;
+		value: T | undefined;
 	}>;
 
 class SelectSingleRootState<T extends string | number> extends SelectBaseRootState<T> {
 	value: SelectSingleRootStateProps<T>["value"];
 	isMulti = false as const;
-	hasValue = $derived.by(() => this.value.current !== "");
+	hasValue = $derived.by(() => this.value.current !== undefined);
 	currentLabel = $derived.by(() => {
 		if (!this.items.current.length) return "";
 		const match = this.items.current.find((item) => item.value === this.value.current)?.label;
@@ -192,18 +192,18 @@ class SelectSingleRootState<T extends string | number> extends SelectBaseRootSta
 		});
 	}
 
-	includesItem = (itemValue: T) => {
+	includesItem = (itemValue?: T) => {
 		return this.value.current === itemValue;
 	};
 
 	toggleItem = (itemValue: T, itemLabel: string = itemValue.toString()) => {
-		this.value.current = this.includesItem(itemValue) ? "" : itemValue;
+		this.value.current = this.includesItem(itemValue) ? undefined : itemValue;
 		this.inputValue = itemLabel;
 	};
 
 	setInitialHighlightedNode = () => {
 		if (this.highlightedNode && document.contains(this.highlightedNode)) return;
-		if (this.value.current !== "") {
+		if (this.value.current !== undefined) {
 			const node = this.getNodeByValue(this.value.current.toString());
 			if (node) {
 				this.setHighlightedNode(node);
@@ -241,7 +241,8 @@ class SelectMultipleRootState<T extends string | number> extends SelectBaseRootS
 		});
 	}
 
-	includesItem = (itemValue: T) => {
+	includesItem = (itemValue?: T) => {
+		if (itemValue === undefined) return false;
 		return this.value.current.includes(itemValue);
 	};
 
@@ -794,7 +795,7 @@ class SelectContentState<T extends string | number> {
 
 type SelectItemStateProps<T extends string | number> = WithRefProps<
 	ReadableBoxedValues<{
-		value: T;
+		value: T | undefined;
 		disabled: boolean;
 		label: string;
 		onHighlight: () => void;
@@ -876,7 +877,7 @@ class SelectItemState<T extends string | number> {
 		}
 
 		// otherwise, toggle the item and if we're not in a multi select, close the menu
-		this.root.toggleItem(this.value.current, this.label.current);
+		this.root.toggleItem(this.value.current!, this.label.current); // Asserting not null TODO test this
 		if (!this.root.isMulti && !isCurrentSelectedValue) {
 			this.root.handleClose();
 		}

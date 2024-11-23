@@ -6,7 +6,7 @@
 	import CaretDoubleUp from "phosphor-svelte/lib/CaretDoubleUp";
 	import CaretDoubleDown from "phosphor-svelte/lib/CaretDoubleDown";
 
-	const themes = [
+	const themes2 = [
 		{ value: "light-monochrome", label: "Light Monochrome" },
 		{ value: "dark-green", label: "Dark Green" },
 		{ value: "svelte-orange", label: "Svelte Orange" },
@@ -29,10 +29,39 @@
 		{ value: "burnt-orange", label: "Burnt Orange" },
 	];
 
-	let value = $state<string>("");
+	const themes = [
+		{ value: 0, label: "Light Monochrome" },
+		{ value: 1, label: "Dark Green" },
+		{ value: 2, label: "Svelte Orange" },
+		{ value: 3, label: "Punk Pink" },
+		{ value: 4, label: "Ocean Blue" },
+		{ value: 5, label: "Sunset Red" },
+		{ value: 6, label: "Forest Green" },
+		{ value: 7, label: "Lavender Purple" },
+		{ value: 8, label: "Mustard Yellow" },
+		{ value: 9, label: "Slate Gray" },
+		{ value: 10, label: "Neon Green" },
+		{ value: 11, label: "Coral Reef" },
+		{ value: 12, label: "Midnight Blue" },
+		{ value: 13, label: "Crimson Red" },
+		{ value: 14, label: "Mint Green" },
+		{ value: 15, label: "Pastel Pink" },
+		{ value: 16, label: "Golden Yellow" },
+		{ value: 17, label: "Deep Purple" },
+		{ value: 18, label: "Turquoise Blue" },
+		{ value: 19, label: "Burnt Orange" },
+	];
+
+	// let value = $state<string>("");
+	// const selectedLabel = $derived(
+	// 	value ? themes.find((theme) => theme.value === value)?.label : "Select a theme"
+	// );
+
+	let value = $state<number | undefined>(undefined);
 	const selectedLabel = $derived(
 		value ? themes.find((theme) => theme.value === value)?.label : "Select a theme"
 	);
+	$inspect(value);
 </script>
 
 <Select.Root type="single" onValueChange={(v) => (value = v)}>

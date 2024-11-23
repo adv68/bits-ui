@@ -80,6 +80,8 @@
 			<SelectHiddenInput value={item} />
 		{/each}
 	{/if}
+{:else if rootState.value.current === undefined}
+	<SelectHiddenInput value="" />
 {:else}
 	<SelectHiddenInput bind:value={rootState.value.current as string} />
 {/if}

@@ -10,7 +10,7 @@
 		id = useId(),
 		ref = $bindable(null),
 		value,
-		label = value.toString(),
+		label = value?.toString() || "",
 		disabled = false,
 		children,
 		child,

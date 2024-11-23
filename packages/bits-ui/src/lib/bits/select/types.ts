@@ -221,7 +221,7 @@ export type SelectItemPropsWithoutHTML<T extends string | number> = WithChild<
 		 *
 		 * @required
 		 */
-		value: T;
+		value?: T;
 
 		/**
 		 * The label of the item. If provided, this is the item that users will search for.
